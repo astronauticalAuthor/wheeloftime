@@ -13,19 +13,26 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/character_name"
+            android:textSize="30sp"
+            android:layout_centerHorizontal="true"
             android:text="@string/character_name_text"/>
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/character_pronunciation"
-            android:text="@string/character_pronunciation_text"/>
+            android:text="@string/character_pronunciation_text"
+            android:textSize="20sp"
+            android:layout_below="@id/character_name"/>
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/audio_icon"/>
+            android:id="@+id/audio_icon"
+            android:layout_toRightOf="@id/character_pronunciation"/>
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/character_description"
+            android:layout_below="@id/character_pronunciation"
+            android:textSize="15sp"
             android:text="@string/character_description_text"/>
 </RelativeLayout>
