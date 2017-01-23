@@ -1,6 +1,7 @@
 package edu.rosehulman.kerrickmandpieragab.wheeloftime;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,9 +22,13 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.View
     public CharacterAdapter(Context context) {
         mContext = context;
 
-        mCharacters.add(new Character("Perrin Aybara"));
-        mCharacters.add(new Character("Mat Cauthon"));
-        mCharacters.add(new Character("Rand Al'Thor"));
+        Character a = new Character("Perrin Aybara", "Pare-in Aye-barr-uh", "One of the three main characters. He is a blacksmith.");
+        Character b = new Character("Mat Cauthon", "Mat Caw-thon", "One of the three main characters. He likes gambling and women.");
+        Character c = new Character("Rand Al'Thor", "Rand al-thore", "The mainest of main characters. He is good at magic and swords.");
+
+        mCharacters.add(a);
+        mCharacters.add(b);
+        mCharacters.add(c);
     }
 
     @Override
@@ -51,6 +56,18 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.View
             super(view);
 
             nameTextView = (TextView)view.findViewById(R.id.character_name);
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Character character = mCharacters.get(getAdapterPosition());
+
+                    Intent detailIntent = new Intent(mContext, CharacterDetailActivity.class);
+                    detailIntent.putExtra(CharacterDetailActivity.CHARACTER_NAME, character.getName());
+                    detailIntent.putExtra(CharacterDetailActivity.CHARACTER_PRONUNCIATION, character.getPronunciation());
+                    detailIntent.putExtra(CharacterDetailActivity.CHARACTER_DESCRIPTION, character.getDescription());
+                    mContext.startActivity(detailIntent);
+                }
+            });
         }
     }
 }
