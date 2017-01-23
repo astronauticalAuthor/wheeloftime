@@ -16,6 +16,12 @@ public class Character {
         mName = name;
     }
 
+    public Character(String name, String pronunciation, String description) {
+        mName = name;
+        mPronunciation = pronunciation;
+        mDescription = description;
+    }
+
     public String getName() {
         return mName;
     }
