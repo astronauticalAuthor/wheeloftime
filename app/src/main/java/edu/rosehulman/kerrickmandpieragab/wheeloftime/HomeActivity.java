@@ -26,11 +26,6 @@ public class HomeActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
 
-//        ViewPager vp = (ViewPager)findViewById(R.id.pager);
-//        vp.setAdapter(new SampleFragmentPagerAdapter(getSupportFragmentManager(), this));
-//
-//        TabLayout tl = (TabLayout)findViewById(R.id.sliding_tabs);
-//        tl.setupWithViewPager(vp);
 
     }
 

@@ -3,6 +3,8 @@ package edu.rosehulman.kerrickmandpieragab.wheeloftime;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -14,21 +16,21 @@ import android.view.MenuItem;
 
 public class SearchActivity extends AppCompatActivity {
 
+    private CharacterAdapter mAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.search_page);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle("");
-        setSupportActionBar(toolbar);
+//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+//        toolbar.setTitle("");
+//        setSupportActionBar(toolbar);
 
-
-//        ViewPager vp = (ViewPager)findViewById(R.id.pager);
-//        vp.setAdapter(new SampleFragmentPagerAdapter(getSupportFragmentManager(), this));
-//
-//        TabLayout tl = (TabLayout)findViewById(R.id.sliding_tabs);
-//        tl.setupWithViewPager(vp);
-
+        RecyclerView recyclerView = (RecyclerView)findViewById(R.id.list_view);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+//        recyclerView.setHasFixedSize(true);
+        mAdapter = new CharacterAdapter(this);
+        recyclerView.setAdapter(mAdapter);
     }
 
     @Override

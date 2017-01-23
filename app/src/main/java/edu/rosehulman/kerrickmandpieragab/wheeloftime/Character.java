@@ -12,39 +12,39 @@ public class Character {
     private String mDescription;
     private MediaStore.Audio mAudio;
 
-    public Character() {
+    public Character(String name) {
+        mName = name;
     }
 
-    public String getmName() {
-
+    public String getName() {
         return mName;
     }
 
-    public void setmName(String mName) {
-        this.mName = mName;
+    public void setName(String name) {
+        mName = name;
     }
 
-    public String getmPronunciation() {
+    public String getPronunciation() {
         return mPronunciation;
     }
 
-    public void setmPronunciation(String mPronunciation) {
-        this.mPronunciation = mPronunciation;
+    public void setPronunciation(String pronunciation) {
+        mPronunciation = pronunciation;
     }
 
-    public String getmDescription() {
+    public String getDescription() {
         return mDescription;
     }
 
-    public void setmDescription(String mDescription) {
-        this.mDescription = mDescription;
+    public void setDescription(String description) {
+        mDescription = description;
     }
 
-    public MediaStore.Audio getmAudio() {
+    public MediaStore.Audio getAudio() {
         return mAudio;
     }
 
-    public void setmAudio(MediaStore.Audio mAudio) {
-        this.mAudio = mAudio;
+    public void setmAudio(MediaStore.Audio audio) {
+        mAudio = audio;
     }
 }
