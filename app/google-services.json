@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "959179879404",
+    "firebase_url": "https://wheel-of-time.firebaseio.com",
+    "project_id": "wheel-of-time",
+    "storage_bucket": "wheel-of-time.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:959179879404:android:28cc82033b3c7330",
+        "android_client_info": {
+          "package_name": "edu.rosehulman.kerrickmandpieragab.wheeloftime"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "959179879404-ufstib51vuc3nduqkbb3jma1nu52bobu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCWHXsCq3Ik_l3QdonKI2OqmvZdyFq8SBY"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
