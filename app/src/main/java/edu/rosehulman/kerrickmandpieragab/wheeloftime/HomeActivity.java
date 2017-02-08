@@ -3,6 +3,8 @@ package edu.rosehulman.kerrickmandpieragab.wheeloftime;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -20,10 +22,33 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.Map;
 
-public class HomeActivity extends AppCompatActivity {
+public class HomeActivity extends AppCompatActivity implements Parcelable {
 
     private DatabaseReference database;
     private NewsAdapter newsAdapter;
+
+    Intent searchIntent;
+    Intent favoriteIntent;
+
+    public HomeActivity() {
+    }
+
+    protected HomeActivity(Parcel in) {
+        searchIntent = in.readParcelable(Intent.class.getClassLoader());
+        favoriteIntent = in.readParcelable(Intent.class.getClassLoader());
+    }
+
+    public static final Creator<HomeActivity> CREATOR = new Creator<HomeActivity>() {
+        @Override
+        public HomeActivity createFromParcel(Parcel in) {
+            return new HomeActivity(in);
+        }
+
+        @Override
+        public HomeActivity[] newArray(int size) {
+            return new HomeActivity[size];
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +75,12 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
 
-
+//        searchIntent = new Intent(this, SearchActivity.class);
+//        favoriteIntent = new Intent(this, FavoriteActivity.class);
+//        searchIntent.putExtra(getString(R.string.HOME_STRING), getIntent());
+//        searchIntent.putExtra(getString(R.string.FAVORITE_STRING), favoriteIntent);
+//        favoriteIntent.putExtra(getString(R.string.HOME_STRING), getIntent());
+//        favoriteIntent.putExtra(getString(R.string.SEARCH_STRING), searchIntent);
     }
 
     @Override
@@ -67,18 +97,29 @@ public class HomeActivity extends AppCompatActivity {
                 return true;
 
             case R.id.action_search:
-                Intent searchIntent = new Intent(this, SearchActivity.class);
+                searchIntent = new Intent(this, SearchActivity.class);
                 startActivity(searchIntent);
                 Log.d("TTT", "Clicked action_search");
                 return true;
 
             case R.id.action_favorites:
-                Intent favoriteIntent = new Intent(this, FavoriteActivity.class);
+                favoriteIntent = new Intent(this,FavoriteActivity.class);
                 startActivity(favoriteIntent);
                 Log.d("TTT", "Clicked action_favorites");
                 return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeParcelable(searchIntent, i);
+        parcel.writeParcelable(favoriteIntent, i);
     }
 }

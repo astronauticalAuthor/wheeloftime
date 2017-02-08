@@ -6,6 +6,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -17,7 +18,8 @@ import java.util.ArrayList;
 public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.ViewHolder> {
 
     private Context mContext;
-    private ArrayList<Character> mCharacters = new ArrayList<Character>();
+    private ArrayList<Character> mCharacters = new ArrayList<>();
+    private ArrayList<Character> mFavorites = new ArrayList<>();
 
     public CharacterAdapter(Context context) {
         mContext = context;
@@ -51,11 +53,13 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.View
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         private TextView nameTextView;
+        private ImageView favImageView;
 
         public ViewHolder(View view) {
             super(view);
 
             nameTextView = (TextView)view.findViewById(R.id.character_name);
+            favImageView = (ImageView)view.findViewById(R.id.favorite_icon);
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -66,6 +70,12 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.View
                     detailIntent.putExtra(CharacterDetailActivity.CHARACTER_PRONUNCIATION, character.getPronunciation());
                     detailIntent.putExtra(CharacterDetailActivity.CHARACTER_DESCRIPTION, character.getDescription());
                     mContext.startActivity(detailIntent);
+                }
+            });
+            favImageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
                 }
             });
         }
