@@ -3,13 +3,22 @@ package edu.rosehulman.kerrickmandpieragab.wheeloftime;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Created by kerrickm on 1/23/2017.
@@ -20,20 +29,47 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.View
     private Context mContext;
     private ArrayList<Character> mCharacters = new ArrayList<>();
     private FavoriteCallback mFavCallback;
-    private RecyclerView mRecyclerView;
+    private DatabaseReference database;
 
-    public CharacterAdapter(Context context, RecyclerView view) {
+    public CharacterAdapter(Context context) {
         mContext = context;
 
         Character a = new Character("Perrin Aybara", "Pare-in Aye-barr-uh", "One of the three main characters. He is a blacksmith.");
         Character b = new Character("Mat Cauthon", "Mat Caw-thon", "One of the three main characters. He likes gambling and women.");
         Character c = new Character("Rand Al'Thor", "Rand al-thore", "The mainest of main characters. He is good at magic and swords.");
 
-        mCharacters.add(a);
-        mCharacters.add(b);
-        mCharacters.add(c);
+//        mCharacters.add(a);
+//        mCharacters.add(b);
+//        mCharacters.add(c);
 
-        mRecyclerView = view;
+        database = FirebaseDatabase.getInstance().getReference();
+        database.child("Characters").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Iterator<DataSnapshot> d = dataSnapshot.getChildren().iterator();
+                while (d.hasNext()) {
+                    DataSnapshot next = d.next();
+                    Log.d("TTT", next.getKey());
+                    Character temp = new Character(next.child("name").getValue() + "", "XXX", next.child("description").getValue() + "");
+                    mCharacters.add(temp);
+//                    Iterator<DataSnapshot> characteristics = next.getChildren().iterator();
+//                    while (characteristics.hasNext()) {
+//                        Log.d("TTT", characteristics.next().getKey());
+//                    }
+
+//                    Log.d("TTT", d.next().getKey());
+//                    d.next().
+                }
+                notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.d("CharacterAdapter", databaseError.getMessage());
+            }
+        });
+
+
     }
 
     @Override
@@ -59,7 +95,7 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.View
     public void addFavoriteToPage(Character ch) {
         notifyItemInserted(0);
         notifyItemRangeChanged(0, mFavCallback.getFavorites().size());
-        mRecyclerView.scrollToPosition(0);
+        notifyItemInserted(0);
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -96,7 +132,7 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.View
     public void addCharacter(Character ch) {
         notifyItemInserted(0);
         notifyItemRangeChanged(0, mCharacters.size());
-        mRecyclerView.scrollToPosition(0);
+        notifyItemInserted(0);
     }
 
     public interface FavoriteCallback {

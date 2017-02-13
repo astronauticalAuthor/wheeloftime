@@ -25,6 +25,7 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.Call
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle("");
         setSupportActionBar(toolbar);
 
         homeFragment = new HomeFragment();

@@ -37,8 +37,6 @@ public class SearchFragment extends Fragment implements Toolbar.OnMenuItemClickL
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mAdapter = new CharacterAdapter(getContext(), view);
-
 //         searchText = (EditText) getActivity().findViewById(R.id.search_bar);
 //        se.archText.addTextChangedListener(new TextWatcher() {
 //            @Override
@@ -67,6 +65,7 @@ public class SearchFragment extends Fragment implements Toolbar.OnMenuItemClickL
         view = (RecyclerView) lay.findViewById(R.id.search_recycler);
         view.setLayoutManager(new LinearLayoutManager(getContext()));
         view.setHasFixedSize(true);
+        mAdapter = new CharacterAdapter(view.getContext());
         view.setAdapter(mAdapter);
 //        lay.addView(view);
         return lay;

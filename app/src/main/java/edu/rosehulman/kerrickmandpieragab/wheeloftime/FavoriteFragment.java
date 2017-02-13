@@ -40,7 +40,7 @@ public class FavoriteFragment extends Fragment implements Toolbar.OnMenuItemClic
 
         RecyclerView view = (RecyclerView) getActivity().findViewById(R.id.favorite_recycler);
 
-        mAdapter = new CharacterAdapter(getContext(), view);
+        mAdapter = new CharacterAdapter(view.getContext());
         Gson gson = new Gson();
         SharedPreferences preferences = getContext().getSharedPreferences(PREFS, MODE_PRIVATE);
         String json = preferences.getString(FAVS, "");
