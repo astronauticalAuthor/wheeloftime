@@ -24,7 +24,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.Map;
 
 public class HomeFragment extends Fragment implements Toolbar.OnMenuItemClickListener, View.OnClickListener {
-    private DatabaseReference database;
+
     private NewsAdapter newsAdapter;
     private Callback mCallback;
 
@@ -33,24 +33,7 @@ public class HomeFragment extends Fragment implements Toolbar.OnMenuItemClickLis
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        newsAdapter = new NewsAdapter(null);
-
-//        final RecyclerView recyclerView = (RecyclerView)findViewById(R.id.news_view);
-//        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-
-//         database = FirebaseDatabase.getInstance().getReference();
-//        database.child("HomeEvents").addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(DataSnapshot dataSnapshot) {
-//
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//                Log.d("HomeFragment", databaseError.getMessage());
-//            }
-//        });
-
+        newsAdapter = new NewsAdapter();
     }
 
     @Override
@@ -58,9 +41,12 @@ public class HomeFragment extends Fragment implements Toolbar.OnMenuItemClickLis
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         RecyclerView view = (RecyclerView) inflater.inflate(R.layout.activity_home, container, false);
+
         view.setLayoutManager(new LinearLayoutManager(getContext()));
         view.setHasFixedSize(true);
+        newsAdapter = new NewsAdapter();
         view.setAdapter(newsAdapter);
+
         return view;
     }
 

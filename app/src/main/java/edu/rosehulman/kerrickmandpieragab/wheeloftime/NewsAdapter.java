@@ -1,11 +1,18 @@
 package edu.rosehulman.kerrickmandpieragab.wheeloftime;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -18,17 +25,31 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
 
     ArrayList<String> titles = new ArrayList<String>();
     ArrayList<String> descriptions = new ArrayList<String>();
+    private DatabaseReference database;
+//    Context mContext;
 
-    public NewsAdapter(Map<String, String> map) {
-        if(map == null){
-            return;
-        }
-        String[] keys = map.keySet().toArray(new String[map.keySet().size()]);
-        for (int x = 0; x < keys.length; x++) {
-            Log.d("TTT", map.get(keys[x]));
-            titles.add(keys[x]);
-            descriptions.add(map.get(keys[x]));
-        }
+    public NewsAdapter() {
+        database = FirebaseDatabase.getInstance().getReference();
+        database.child("HomeEvents").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Map<String, String> map = (Map<String, String>)dataSnapshot.getValue();
+
+                String[] keys = map.keySet().toArray(new String[map.keySet().size()]);
+                for (int x = 0; x < keys.length; x++) {
+                    Log.d("TTT", map.get(keys[x]));
+                    titles.add(keys[x]);
+                    descriptions.add(map.get(keys[x]));
+                }
+
+                notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.d("NewsAdapter", databaseError.getMessage());
+            }
+        });
     }
 
     @Override
