@@ -10,4 +10,6 @@
     <string name="HOME_STRING">home</string>
     <string name="FAVORITE_STRING">favorite</string>
     <string name="SEARCH_STRING">search</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="enter_a_name">Enter a name</string>
 </resources>

@@ -10,6 +10,16 @@ public class Character {
     private String mName;
     private String mPronunciation;
     private String mDescription;
+
+    public boolean isFavorite() {
+        return isFavorite;
+    }
+
+    public void setFavorite(boolean favorite) {
+        isFavorite = favorite;
+    }
+
+    private boolean isFavorite;
     private MediaStore.Audio mAudio;
 
     public Character(String name) {
@@ -20,6 +30,7 @@ public class Character {
         mName = name;
         mPronunciation = pronunciation;
         mDescription = description;
+        isFavorite = false;
     }
 
     public String getName() {

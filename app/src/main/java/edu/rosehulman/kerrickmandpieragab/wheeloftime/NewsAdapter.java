@@ -20,6 +20,9 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
     ArrayList<String> descriptions = new ArrayList<String>();
 
     public NewsAdapter(Map<String, String> map) {
+        if(map == null){
+            return;
+        }
         String[] keys = map.keySet().toArray(new String[map.keySet().size()]);
         for (int x = 0; x < keys.length; x++) {
             Log.d("TTT", map.get(keys[x]));

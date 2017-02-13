@@ -19,9 +19,10 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.View
 
     private Context mContext;
     private ArrayList<Character> mCharacters = new ArrayList<>();
-    private ArrayList<Character> mFavorites = new ArrayList<>();
+    private FavoriteCallback mFavCallback;
+    private RecyclerView mRecyclerView;
 
-    public CharacterAdapter(Context context) {
+    public CharacterAdapter(Context context, RecyclerView view) {
         mContext = context;
 
         Character a = new Character("Perrin Aybara", "Pare-in Aye-barr-uh", "One of the three main characters. He is a blacksmith.");
@@ -31,6 +32,8 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.View
         mCharacters.add(a);
         mCharacters.add(b);
         mCharacters.add(c);
+
+        mRecyclerView = view;
     }
 
     @Override
@@ -43,11 +46,20 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.View
     public void onBindViewHolder(ViewHolder holder, int position) {
         Character character = mCharacters.get(position);
         holder.nameTextView.setText(character.getName());
+        if (character.isFavorite()) {
+//            holder.favImageView.setImageIcon(mContext.getResources().getDrawable(R.icon.star_full));
+        }
     }
 
     @Override
     public int getItemCount() {
         return mCharacters.size();
+    }
+
+    public void addFavoriteToPage(Character ch) {
+        notifyItemInserted(0);
+        notifyItemRangeChanged(0, mFavCallback.getFavorites().size());
+        mRecyclerView.scrollToPosition(0);
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -75,9 +87,20 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.View
             favImageView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-
+                    mFavCallback.addFavorite(mCharacters.get(getAdapterPosition()));
                 }
             });
         }
+    }
+
+    public void addCharacter(Character ch) {
+        notifyItemInserted(0);
+        notifyItemRangeChanged(0, mCharacters.size());
+        mRecyclerView.scrollToPosition(0);
+    }
+
+    public interface FavoriteCallback {
+        void addFavorite(Character ch);
+        ArrayList<Character> getFavorites();
     }
 }
