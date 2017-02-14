@@ -20,8 +20,10 @@ import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -39,39 +41,39 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.View
     static private String PREFS = "preference";
     static private String FAVS = "favorites";
 
-    public CharacterAdapter(Context context, String fragmentName) {
+    public CharacterAdapter(Context context, final String fragmentName) {
         mContext = context;
 
         if (fragmentName.equals("FavoriteFragment")) {
-            Gson gson = new Gson();
             SharedPreferences preferences = mContext.getSharedPreferences(PREFS, MODE_PRIVATE);
-            String json = preferences.getString(FAVS, null);
-            Character[] holder = gson.fromJson(json, Character[].class);
-            mFavorites = (ArrayList<Character>)Arrays.asList(holder);
+            Set<String> favNames = preferences.getStringSet(FAVS, null);
+
+            mFavorites = namesToCharacters(favNames);
 
             if (mFavorites != null) {
                 for (Character ch : mFavorites) {
                     addFavoriteToPage(ch);
                 }
+            } else {
+                mFavorites = new ArrayList<>();
             }
         }
-
         else if (fragmentName.equals("SearchFragment")) {
             database = FirebaseDatabase.getInstance().getReference();
             database.child("Characters").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     Iterator<DataSnapshot> d = dataSnapshot.getChildren().iterator();
-
                     while (d.hasNext()) {
                         DataSnapshot next = d.next();
-                        Character temp = new Character(next.child("name").getValue().toString(),
-                                                       next.child("pronunciation").getValue().toString(),
-                                                       next.child("description").getValue().toString());
+                        Log.d("TTT", next.getKey());
+                        Character temp = new Character(next.child("name").getValue() + "", "XXX", next.child("description").getValue() + "");
                         mCharacters.add(temp);
                         storedCharaters.add(temp);
                     }
-                    notifyDataSetChanged();
+                    if (fragmentName.equals("SearchFragment")) {
+                        notifyDataSetChanged();
+                    }
                 }
 
                 @Override
@@ -80,6 +82,22 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.View
                 }
             });
         }
+
+    }
+
+    private ArrayList<Character> namesToCharacters(Set<String> favNames) {
+        ArrayList<Character> favs = new ArrayList<>();
+        if (favNames == null) {
+            return null;
+        }
+        for (String name : favNames) {
+            for (Character ch : mCharacters) {
+                if (ch.getName().equals(name)) {
+                    favs.add(ch);
+                }
+            }
+        }
+        return favs;
     }
 
     @Override
@@ -93,7 +111,7 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.View
         Character character = mCharacters.get(position);
         holder.nameTextView.setText(character.getName());
         if (character.isFavorite()) {
-//            holder.favImageView.setImageIcon(mContext.getResources().getDrawable(R.icon.star_full));
+            holder.favImageView.setImageResource(android.R.drawable.star_on);
         }
     }
 
@@ -108,48 +126,8 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.View
         notifyItemInserted(0);
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
-
-        private TextView nameTextView;
-        private ImageView favImageView;
-
-        public ViewHolder(View view) {
-            super(view);
-
-            nameTextView = (TextView)view.findViewById(R.id.character_name);
-            favImageView = (ImageView)view.findViewById(R.id.favorite_icon);
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Character character = mCharacters.get(getAdapterPosition());
-
-                    Intent detailIntent = new Intent(mContext, CharacterDetailActivity.class);
-                    detailIntent.putExtra(CharacterDetailActivity.CHARACTER_NAME, character.getName());
-                    detailIntent.putExtra(CharacterDetailActivity.CHARACTER_PRONUNCIATION, character.getPronunciation());
-                    detailIntent.putExtra(CharacterDetailActivity.CHARACTER_DESCRIPTION, character.getDescription());
-                    mContext.startActivity(detailIntent);
-                }
-            });
-            favImageView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (mCharacters.get(getAdapterPosition()).isFavorite()) {
-                        removeFavorite(getAdapterPosition());
-                        favImageView.setImageResource(android.R.drawable.star_off);
-                    } else {
-                        addFavorite(mCharacters.get(getAdapterPosition()));
-                        favImageView.setImageResource(android.R.drawable.star_on);
-                    }
-                    
-                }
-            });
-        }
-    }
-
-    private void removeFavorite(int pos) {
-        mFavorites.remove(pos);
-        notifyItemRemoved(pos);
-        notifyItemRangeChanged(pos, mFavorites.size());
+    private void removeFavorite(Character ch) {
+        mFavorites.remove(ch);
     }
 
     public void filter(String s) {
@@ -175,10 +153,57 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.View
         addFavoriteToPage(ch);
         SharedPreferences preferences = mContext.getSharedPreferences(PREFS, MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
-        Gson gson = new Gson();
-        String json = gson.toJson(ch);
-        editor.putString(FAVS, json);
-        editor.apply();
+        Set<String> names = getNames();
+        editor.putStringSet(FAVS, names);
+        editor.commit();
+        Log.d("FUCK", mFavorites.toString());
     }
 
+    private Set<String> getNames() {
+        Set<String> names = new HashSet<>();
+        for (Character ch : mFavorites) {
+            names.add(ch.getName());
+        }
+        return names;
+    }
+
+    class ViewHolder extends RecyclerView.ViewHolder {
+
+        private TextView nameTextView;
+        private ImageView favImageView;
+
+        public ViewHolder(View view) {
+            super(view);
+
+            nameTextView = (TextView)view.findViewById(R.id.character_name);
+            favImageView = (ImageView)view.findViewById(R.id.favorite_icon);
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Character character = mCharacters.get(getAdapterPosition());
+
+                    Intent detailIntent = new Intent(mContext, CharacterDetailActivity.class);
+                    detailIntent.putExtra(CharacterDetailActivity.CHARACTER_NAME, character.getName());
+                    detailIntent.putExtra(CharacterDetailActivity.CHARACTER_PRONUNCIATION, character.getPronunciation());
+                    detailIntent.putExtra(CharacterDetailActivity.CHARACTER_DESCRIPTION, character.getDescription());
+                    mContext.startActivity(detailIntent);
+                }
+            });
+            favImageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (mCharacters.get(getAdapterPosition()).isFavorite()) {
+                        mCharacters.get(getAdapterPosition()).setFavorite(false);
+                        removeFavorite(mCharacters.get(getAdapterPosition()));
+                        favImageView.setImageResource(android.R.drawable.star_off);
+                    } else {
+                        addFavorite(mCharacters.get(getAdapterPosition()));
+                        favImageView.setImageResource(android.R.drawable.star_on);
+                        mCharacters.get(getAdapterPosition()).setFavorite(true);
+                    }
+
+                }
+            });
+        }
+    }
 }
