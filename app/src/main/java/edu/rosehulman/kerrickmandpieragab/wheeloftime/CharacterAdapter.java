@@ -32,9 +32,10 @@ import static android.content.Context.MODE_PRIVATE;
 public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.ViewHolder> {
 
     private Context mContext;
-    private ArrayList<Character> mCharacters = new ArrayList<>();
+    private ArrayList<Character> mCharacters = new ArrayList<Character>();
     private DatabaseReference database;
     private ArrayList<Character> mFavorites;
+    private ArrayList<Character> storedCharaters = new ArrayList<Character>();
     static private String PREFS = "preference";
     static private String FAVS = "favorites";
 
@@ -55,32 +56,20 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.View
             }
         }
 
-//        Character a = new Character("Perrin Aybara", "Pare-in Aye-barr-uh", "One of the three main characters. He is a blacksmith.");
-//        Character b = new Character("Mat Cauthon", "Mat Caw-thon", "One of the three main characters. He likes gambling and women.");
-//        Character c = new Character("Rand Al'Thor", "Rand al-thore", "The mainest of main characters. He is good at magic and swords.");
-
-//        mCharacters.add(a);
-//        mCharacters.add(b);
-//        mCharacters.add(c);
-
         else if (fragmentName.equals("SearchFragment")) {
             database = FirebaseDatabase.getInstance().getReference();
             database.child("Characters").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     Iterator<DataSnapshot> d = dataSnapshot.getChildren().iterator();
+
                     while (d.hasNext()) {
                         DataSnapshot next = d.next();
-                        Log.d("TTT", next.getKey());
-                        Character temp = new Character(next.child("name").getValue() + "", "XXX", next.child("description").getValue() + "");
+                        Character temp = new Character(next.child("name").getValue().toString(),
+                                                       next.child("pronunciation").getValue().toString(),
+                                                       next.child("description").getValue().toString());
                         mCharacters.add(temp);
-//                    Iterator<DataSnapshot> characteristics = next.getChildren().iterator();
-//                    while (characteristics.hasNext()) {
-//                        Log.d("TTT", characteristics.next().getKey());
-//                    }
-
-//                    Log.d("TTT", d.next().getKey());
-//                    d.next().
+                        storedCharaters.add(temp);
                     }
                     notifyDataSetChanged();
                 }
@@ -161,6 +150,18 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.View
         mFavorites.remove(pos);
         notifyItemRemoved(pos);
         notifyItemRangeChanged(pos, mFavorites.size());
+    }
+
+    public void filter(String s) {
+        mCharacters.clear();
+        for (int x = 0; x < storedCharaters.size(); x++) {
+            Character temp = storedCharaters.get(x);
+            if (temp.getName().toUpperCase().contains(s.toUpperCase())) {
+                mCharacters.add(temp);
+            }
+        }
+
+        notifyDataSetChanged();
     }
 
     public void addCharacter(Character ch) {
