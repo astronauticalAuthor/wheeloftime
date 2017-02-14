@@ -124,7 +124,7 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.View
         Character character = mCharacters.get(position);
         holder.nameTextView.setText(character.getName());
         if (character.isFavorite()) {
-//            holder.favImageView.setImageIcon(mContext.getResources().getDrawable(R.icon.star_full));
+            holder.favImageView.setImageResource(android.R.drawable.star_on);
         }
     }
 
@@ -165,11 +165,13 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.View
                 @Override
                 public void onClick(View view) {
                     if (mCharacters.get(getAdapterPosition()).isFavorite()) {
-                        removeFavorite(getAdapterPosition());
+                        mCharacters.get(getAdapterPosition()).setFavorite(false);
+                        removeFavorite(mCharacters.get(getAdapterPosition()));
                         favImageView.setImageResource(android.R.drawable.star_off);
                     } else {
                         addFavorite(mCharacters.get(getAdapterPosition()));
                         favImageView.setImageResource(android.R.drawable.star_on);
+                        mCharacters.get(getAdapterPosition()).setFavorite(true);
                     }
                     
                 }
@@ -177,10 +179,10 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.View
         }
     }
 
-    private void removeFavorite(int pos) {
-        mFavorites.remove(pos);
-        notifyItemRemoved(pos);
-        notifyItemRangeChanged(pos, mFavorites.size());
+    private void removeFavorite(Character ch) {
+        mFavorites.remove(ch);
+//        notifyItemRemoved();
+//        notifyItemRangeChanged(0, mFavorites.size());
     }
 
     public void addCharacter(Character ch) {
@@ -196,7 +198,8 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.View
         SharedPreferences.Editor editor = preferences.edit();
         Set<String> names = getNames();
         editor.putStringSet(FAVS, names);
-        editor.apply();
+        editor.commit();
+        Log.d("FUCK", mFavorites.toString());
     }
 
     private Set<String> getNames() {
