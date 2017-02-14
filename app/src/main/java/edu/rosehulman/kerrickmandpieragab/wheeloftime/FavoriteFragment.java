@@ -27,28 +27,18 @@ import static android.content.Context.MODE_PRIVATE;
  * Created by pieragab on 1/23/2017.
  */
 
-public class FavoriteFragment extends Fragment implements Toolbar.OnMenuItemClickListener, View.OnClickListener, CharacterAdapter.FavoriteCallback {
+public class FavoriteFragment extends Fragment implements Toolbar.OnMenuItemClickListener, View.OnClickListener {
     private CharacterAdapter mAdapter;
-    static private String PREFS = "preference";
-    static private String FAVS = "favorites";
-    public ArrayList<Character> mFavorites;
     private HomeFragment.Callback mCallback;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        RecyclerView view = (RecyclerView) getActivity().findViewById(R.id.favorite_recycler);
+//        RecyclerView view = (RecyclerView) getActivity().findViewById(R.id.favorite_recycler);
 
-        mAdapter = new CharacterAdapter(view.getContext());
-        Gson gson = new Gson();
-        SharedPreferences preferences = getContext().getSharedPreferences(PREFS, MODE_PRIVATE);
-        String json = preferences.getString(FAVS, "");
-        mFavorites = gson.fromJson(json, ArrayList.class);
 
-        for (Character ch : mFavorites) {
-            mAdapter.addFavoriteToPage(ch);
-        }
+
 
 //        ViewPager vp = (ViewPager)findViewById(R.id.pager);
 //        vp.setAdapter(new SampleFragmentPagerAdapter(getSupportFragmentManager(), this));
@@ -68,6 +58,7 @@ public class FavoriteFragment extends Fragment implements Toolbar.OnMenuItemClic
         RecyclerView view = (RecyclerView) inflater.inflate(R.layout.favorites_page, container, false);
         view.setLayoutManager(new LinearLayoutManager(getContext()));
         view.setHasFixedSize(true);
+        mAdapter = new CharacterAdapter(view.getContext(), "FavoriteFragment");
         view.setAdapter(mAdapter);
         return view;
     }
@@ -116,20 +107,4 @@ public class FavoriteFragment extends Fragment implements Toolbar.OnMenuItemClic
         mCallback = null;
     }
 
-    @Override
-    public void addFavorite(Character ch) {
-        mFavorites.add(0, ch);
-        mAdapter.addFavoriteToPage(ch);
-        SharedPreferences preferences = getContext().getSharedPreferences(PREFS, MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        Gson gson = new Gson();
-        String json = gson.toJson(ch);
-        editor.putString(FAVS, json);
-        editor.commit();
-    }
-
-    @Override
-    public ArrayList<Character> getFavorites() {
-        return mFavorites;
-    }
 }
