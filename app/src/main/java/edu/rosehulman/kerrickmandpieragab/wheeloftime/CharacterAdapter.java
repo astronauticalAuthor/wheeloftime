@@ -20,8 +20,10 @@ import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -34,24 +36,25 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.View
     private Context mContext;
     private ArrayList<Character> mCharacters = new ArrayList<>();
     private DatabaseReference database;
-    private ArrayList<Character> mFavorites;
+    private ArrayList<Character> mFavorites = new ArrayList<>();
     static private String PREFS = "preference";
     static private String FAVS = "favorites";
 
-    public CharacterAdapter(Context context, String fragmentName) {
+    public CharacterAdapter(Context context, final String fragmentName) {
         mContext = context;
 
         if (fragmentName.equals("FavoriteFragment")) {
-            Gson gson = new Gson();
             SharedPreferences preferences = mContext.getSharedPreferences(PREFS, MODE_PRIVATE);
-            String json = preferences.getString(FAVS, null);
-            Character[] holder = gson.fromJson(json, Character[].class);
-            mFavorites = (ArrayList<Character>)Arrays.asList(holder);
+            Set<String> favNames = preferences.getStringSet(FAVS, null);
+
+            mFavorites = namesToCharacters(favNames);
 
             if (mFavorites != null) {
                 for (Character ch : mFavorites) {
                     addFavoriteToPage(ch);
                 }
+            } else {
+                mFavorites = new ArrayList<>();
             }
         }
 
@@ -63,34 +66,51 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.View
 //        mCharacters.add(b);
 //        mCharacters.add(c);
 
-        else if (fragmentName.equals("SearchFragment")) {
-            database = FirebaseDatabase.getInstance().getReference();
-            database.child("Characters").addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    Iterator<DataSnapshot> d = dataSnapshot.getChildren().iterator();
-                    while (d.hasNext()) {
-                        DataSnapshot next = d.next();
-                        Log.d("TTT", next.getKey());
-                        Character temp = new Character(next.child("name").getValue() + "", "XXX", next.child("description").getValue() + "");
-                        mCharacters.add(temp);
-//                    Iterator<DataSnapshot> characteristics = next.getChildren().iterator();
-//                    while (characteristics.hasNext()) {
-//                        Log.d("TTT", characteristics.next().getKey());
-//                    }
 
-//                    Log.d("TTT", d.next().getKey());
-//                    d.next().
-                    }
+        database = FirebaseDatabase.getInstance().getReference();
+        database.child("Characters").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+            Iterator<DataSnapshot> d = dataSnapshot.getChildren().iterator();
+                while (d.hasNext()) {
+                    DataSnapshot next = d.next();
+                    Log.d("TTT", next.getKey());
+                    Character temp = new Character(next.child("name").getValue() + "", "XXX", next.child("description").getValue() + "");
+                    mCharacters.add(temp);
+//                  Iterator<DataSnapshot> characteristics = next.getChildren().iterator();
+//                  while (characteristics.hasNext()) {
+//                     Log.d("TTT", characteristics.next().getKey());
+//                  }
+
+//                  Log.d("TTT", d.next().getKey());
+//                  d.next().
+                }
+                if (fragmentName.equals("SearchFragment")) {
                     notifyDataSetChanged();
                 }
+            }
 
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                    Log.d("CharacterAdapter", databaseError.getMessage());
-                }
-            });
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.d("CharacterAdapter", databaseError.getMessage());
+            }
+        });
+
+    }
+
+    private ArrayList<Character> namesToCharacters(Set<String> favNames) {
+        ArrayList<Character> favs = new ArrayList<>();
+        if (favNames == null) {
+            return null;
         }
+        for (String name : favNames) {
+            for (Character ch : mCharacters) {
+                if (ch.getName().equals(name)) {
+                    favs.add(ch);
+                }
+            }
+        }
+        return favs;
     }
 
     @Override
@@ -174,10 +194,18 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.View
         addFavoriteToPage(ch);
         SharedPreferences preferences = mContext.getSharedPreferences(PREFS, MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
-        Gson gson = new Gson();
-        String json = gson.toJson(ch);
-        editor.putString(FAVS, json);
+        Set<String> names = getNames();
+        editor.putStringSet(FAVS, names);
         editor.apply();
     }
+
+    private Set<String> getNames() {
+        Set<String> names = new HashSet<>();
+        for (Character ch : mFavorites) {
+            names.add(ch.getName());
+        }
+        return names;
+    }
+
 
 }
