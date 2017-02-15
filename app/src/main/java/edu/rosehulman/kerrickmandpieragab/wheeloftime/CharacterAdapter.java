@@ -36,7 +36,7 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.View
     private Context mContext;
     private ArrayList<Character> mCharacters = new ArrayList<Character>();
     private DatabaseReference database;
-    private ArrayList<Character> mFavorites;
+    private ArrayList<Character> mFavorites = new ArrayList<>();
     private ArrayList<Character> storedCharaters = new ArrayList<Character>();
     static private String PREFS = "preference";
     static private String FAVS = "favorites";
@@ -58,16 +58,21 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.View
                 mFavorites = new ArrayList<>();
             }
         }
-        else if (fragmentName.equals("SearchFragment")) {
+
+
             database = FirebaseDatabase.getInstance().getReference();
             database.child("Characters").addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
+                    Set<String> favNames = getNames();
                     Iterator<DataSnapshot> d = dataSnapshot.getChildren().iterator();
                     while (d.hasNext()) {
                         DataSnapshot next = d.next();
                         Log.d("TTT", next.getKey());
                         Character temp = new Character(next.child("name").getValue() + "", "XXX", next.child("description").getValue() + "");
+                        if (favNames.contains(temp.getName())) {
+                            temp.setFavorite(true);
+                        }
                         mCharacters.add(temp);
                         storedCharaters.add(temp);
                     }
@@ -81,7 +86,7 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.View
                     Log.d("CharacterAdapter", databaseError.getMessage());
                 }
             });
-        }
+
 
     }
 
@@ -146,7 +151,7 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.View
         SharedPreferences.Editor editor = preferences.edit();
         Set<String> names = getNames();
         editor.putStringSet(FAVS, names);
-        editor.commit();
+        editor.apply();
         Log.d("FUCK", mFavorites.toString());
     }
 
@@ -180,9 +185,10 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.View
                         removeFavorite(mCharacters.get(getAdapterPosition()));
                         favImageView.setImageResource(android.R.drawable.star_off);
                     } else {
+                        mCharacters.get(getAdapterPosition()).setFavorite(true);
                         addFavorite(mCharacters.get(getAdapterPosition()));
                         favImageView.setImageResource(android.R.drawable.star_on);
-                        mCharacters.get(getAdapterPosition()).setFavorite(true);
+
                     }
 
                 }
@@ -196,7 +202,7 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.View
         SharedPreferences.Editor editor = preferences.edit();
         Set<String> names = getNames();
         editor.putStringSet(FAVS, names);
-        editor.commit();
+        editor.apply();
         Log.d("FUCK", mFavorites.toString());
 //        notifyItemRemoved();
 //        notifyItemRangeChanged(0, mFavorites.size());
