@@ -181,6 +181,12 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.View
 
     private void removeFavorite(Character ch) {
         mFavorites.remove(ch);
+        SharedPreferences preferences = mContext.getSharedPreferences(PREFS, MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        Set<String> names = getNames();
+        editor.putStringSet(FAVS, names);
+        editor.commit();
+        Log.d("FUCK", mFavorites.toString());
 //        notifyItemRemoved();
 //        notifyItemRangeChanged(0, mFavorites.size());
     }
