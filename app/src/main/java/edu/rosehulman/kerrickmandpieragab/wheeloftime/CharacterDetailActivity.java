@@ -1,9 +1,26 @@
 package edu.rosehulman.kerrickmandpieragab.wheeloftime;
 
 import android.content.Intent;
+import android.media.MediaPlayer;
+import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.ImageButton;
 import android.widget.TextView;
+
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.storage.FileDownloadTask;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 public class CharacterDetailActivity extends AppCompatActivity {
 
@@ -13,6 +30,8 @@ public class CharacterDetailActivity extends AppCompatActivity {
     TextView mName;
     TextView mDescription;
     TextView mPronunciation;
+    ImageButton audio;
+    final FirebaseStorage storage = FirebaseStorage.getInstance();
 
 
     @Override
@@ -23,11 +42,27 @@ public class CharacterDetailActivity extends AppCompatActivity {
         mName = (TextView)findViewById(R.id.character_name);
         mDescription = (TextView)findViewById(R.id.character_description);
         mPronunciation = (TextView)findViewById(R.id.character_pronunciation);
+        audio = (ImageButton)findViewById(R.id.audio_button);
 
         Intent intent = getIntent();
         mName.setText(intent.getStringExtra(CHARACTER_NAME));
         mDescription.setText(intent.getStringExtra(CHARACTER_DESCRIPTION));
         mPronunciation.setText(intent.getStringExtra(CHARACTER_PRONUNCIATION));
+
+
+        audio.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                StorageReference sr = storage.getReferenceFromUrl("gs://wheel-of-time.appspot.com/late.mp3");
+                sr.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        MediaPlayer mp = MediaPlayer.create(CharacterDetailActivity.this, uri);
+                        mp.start();
+                    }
+                });
+            }
+        });
 
     }
 }

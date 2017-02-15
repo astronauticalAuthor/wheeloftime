@@ -37,7 +37,6 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
 
                 String[] keys = map.keySet().toArray(new String[map.keySet().size()]);
                 for (int x = 0; x < keys.length; x++) {
-                    Log.d("TTT", map.get(keys[x]));
                     titles.add(keys[x]);
                     descriptions.add(map.get(keys[x]));
                 }

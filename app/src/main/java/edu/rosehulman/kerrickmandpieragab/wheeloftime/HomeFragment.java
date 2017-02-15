@@ -55,16 +55,13 @@ public class HomeFragment extends Fragment implements Toolbar.OnMenuItemClickLis
         int id = item.getItemId();
         switch (id) {
             case R.id.action_home:
-                Log.d("already in home", "Clicked action_home");
                 return true;
             case R.id.action_search:
                 mCallback.searchClick(this);
-                Log.d("TTT", "Clicked action_search");
                 return true;
 
             case R.id.action_favorites:
                 mCallback.favoriteClick(this);
-                Log.d("TTT", "Clicked action_favorites");
                 return true;
         }
         return false;

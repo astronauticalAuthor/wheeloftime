@@ -34,9 +34,10 @@ import static android.content.Context.MODE_PRIVATE;
 public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.ViewHolder> {
 
     private Context mContext;
-    private ArrayList<Character> mCharacters = new ArrayList<>();
+    private ArrayList<Character> mCharacters = new ArrayList<Character>();
     private DatabaseReference database;
-    private ArrayList<Character> mFavorites = new ArrayList<>();
+    private ArrayList<Character> mFavorites;
+    private ArrayList<Character> storedCharaters = new ArrayList<Character>();
     static private String PREFS = "preference";
     static private String FAVS = "favorites";
 
@@ -57,44 +58,30 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.View
                 mFavorites = new ArrayList<>();
             }
         }
-
-//        Character a = new Character("Perrin Aybara", "Pare-in Aye-barr-uh", "One of the three main characters. He is a blacksmith.");
-//        Character b = new Character("Mat Cauthon", "Mat Caw-thon", "One of the three main characters. He likes gambling and women.");
-//        Character c = new Character("Rand Al'Thor", "Rand al-thore", "The mainest of main characters. He is good at magic and swords.");
-
-//        mCharacters.add(a);
-//        mCharacters.add(b);
-//        mCharacters.add(c);
-
-
-        database = FirebaseDatabase.getInstance().getReference();
-        database.child("Characters").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-            Iterator<DataSnapshot> d = dataSnapshot.getChildren().iterator();
-                while (d.hasNext()) {
-                    DataSnapshot next = d.next();
-                    Log.d("TTT", next.getKey());
-                    Character temp = new Character(next.child("name").getValue() + "", "XXX", next.child("description").getValue() + "");
-                    mCharacters.add(temp);
-//                  Iterator<DataSnapshot> characteristics = next.getChildren().iterator();
-//                  while (characteristics.hasNext()) {
-//                     Log.d("TTT", characteristics.next().getKey());
-//                  }
-
-//                  Log.d("TTT", d.next().getKey());
-//                  d.next().
+        else if (fragmentName.equals("SearchFragment")) {
+            database = FirebaseDatabase.getInstance().getReference();
+            database.child("Characters").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    Iterator<DataSnapshot> d = dataSnapshot.getChildren().iterator();
+                    while (d.hasNext()) {
+                        DataSnapshot next = d.next();
+                        Log.d("TTT", next.getKey());
+                        Character temp = new Character(next.child("name").getValue() + "", "XXX", next.child("description").getValue() + "");
+                        mCharacters.add(temp);
+                        storedCharaters.add(temp);
+                    }
+                    if (fragmentName.equals("SearchFragment")) {
+                        notifyDataSetChanged();
+                    }
                 }
-                if (fragmentName.equals("SearchFragment")) {
-                    notifyDataSetChanged();
-                }
-            }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.d("CharacterAdapter", databaseError.getMessage());
-            }
-        });
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    Log.d("CharacterAdapter", databaseError.getMessage());
+                }
+            });
+        }
 
     }
 
@@ -139,7 +126,31 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.View
         notifyItemInserted(0);
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public void filter(String s) {
+        mCharacters.clear();
+        for (int x = 0; x < storedCharaters.size(); x++) {
+            Character temp = storedCharaters.get(x);
+            if (temp.getName().toUpperCase().contains(s.toUpperCase())) {
+                mCharacters.add(temp);
+            }
+        }
+
+        notifyDataSetChanged();
+    }
+
+
+    public void addFavorite(Character ch) {
+        mFavorites.add(0, ch);
+        addFavoriteToPage(ch);
+        SharedPreferences preferences = mContext.getSharedPreferences(PREFS, MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        Set<String> names = getNames();
+        editor.putStringSet(FAVS, names);
+        editor.commit();
+        Log.d("FUCK", mFavorites.toString());
+    }
+
+    class ViewHolder extends RecyclerView.ViewHolder {
 
         private TextView nameTextView;
         private ImageView favImageView;
@@ -173,7 +184,7 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.View
                         favImageView.setImageResource(android.R.drawable.star_on);
                         mCharacters.get(getAdapterPosition()).setFavorite(true);
                     }
-                    
+
                 }
             });
         }
@@ -197,16 +208,6 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.View
         notifyItemInserted(0);
     }
 
-    public void addFavorite(Character ch) {
-        mFavorites.add(0, ch);
-        addFavoriteToPage(ch);
-        SharedPreferences preferences = mContext.getSharedPreferences(PREFS, MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        Set<String> names = getNames();
-        editor.putStringSet(FAVS, names);
-        editor.commit();
-        Log.d("FUCK", mFavorites.toString());
-    }
 
     private Set<String> getNames() {
         Set<String> names = new HashSet<>();
@@ -215,6 +216,4 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.View
         }
         return names;
     }
-
-
 }

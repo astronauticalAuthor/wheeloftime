@@ -52,20 +52,17 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.Call
             case R.id.action_home:
                 ft.replace(R.id.fragment, homeFragment, "Home");
                 ft.commit();
-                Log.d("TTT", "Clicked action_home");
 
                 return true;
             case R.id.action_search:
                 ft.replace(R.id.fragment, searchFragment, "Search");
                 ft.commit();
-                Log.d("already in search", "Clicked action_search");
 
                 return true;
 
             case R.id.action_favorites:
                 ft.replace(R.id.fragment, favoriteFragment, "Favorites");
                 ft.commit();
-                Log.d("TTT", "Clicked action_favorites");
                 return true;
         }
         return false;

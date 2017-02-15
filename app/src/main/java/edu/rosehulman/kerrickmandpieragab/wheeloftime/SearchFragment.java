@@ -29,6 +29,7 @@ public class SearchFragment extends Fragment implements Toolbar.OnMenuItemClickL
     private HomeFragment.Callback mCallback;
     private CharacterAdapter mAdapter;
     RecyclerView view;
+    EditText searchText;
 
     public SearchFragment() {
     }
@@ -36,23 +37,6 @@ public class SearchFragment extends Fragment implements Toolbar.OnMenuItemClickL
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-//         searchText = (EditText) getActivity().findViewById(R.id.search_bar);
-//        se.archText.addTextChangedListener(new TextWatcher() {
-//            @Override
-//            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-//            }
-//
-//            @Override
-//            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-//                Log.d("Search bar", "Text changed");
-//            }
-//
-//            @Override
-//            public void afterTextChanged(Editable editable) {
-//            }
-//        });
-
     }
 
 
@@ -67,7 +51,23 @@ public class SearchFragment extends Fragment implements Toolbar.OnMenuItemClickL
         view.setHasFixedSize(true);
         mAdapter = new CharacterAdapter(view.getContext(), "SearchFragment");
         view.setAdapter(mAdapter);
-//        lay.addView(view);
+
+        searchText = (EditText)lay.findViewById(R.id.search_bar);
+        searchText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                mAdapter.filter(charSequence.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+            }
+        });
+
         return lay;
     }
 
@@ -77,16 +77,13 @@ public class SearchFragment extends Fragment implements Toolbar.OnMenuItemClickL
         switch (id) {
             case R.id.action_home:
                 mCallback.homeClick(this);
-                Log.d("TTT", "Clicked action_home");
                 return true;
             case R.id.action_search:
                 mCallback.searchClick(this);
-                Log.d("already in search", "Clicked action_search");
                 return true;
 
             case R.id.action_favorites:
                 mCallback.favoriteClick(this);
-                Log.d("TTT", "Clicked action_favorites");
                 return true;
         }
         return false;
