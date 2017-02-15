@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/favorite_recycler"
-    android:layout_marginTop="50dp"
+    android:layout_marginTop="60dp"
     tools:context="edu.rosehulman.kerrickmandpieragab.wheeloftime.MainActivity">
 
 </android.support.v7.widget.RecyclerView>

@@ -1,6 +1,7 @@
 package edu.rosehulman.kerrickmandpieragab.wheeloftime;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -13,11 +14,20 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.TreeSet;
+
 public class MainActivity extends AppCompatActivity implements HomeFragment.Callback {
     Fragment homeFragment;
     Fragment searchFragment;
     Fragment favoriteFragment;
     NewsAdapter mNewsAdapter;
+    public static ArrayList<String> favorites;
+    private String FAVORITES = "FAVORITES";
+    private String PREFS = "PREFS";
 
 
     @Override
@@ -28,12 +38,23 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.Call
         toolbar.setTitle("");
         setSupportActionBar(toolbar);
 
+        SharedPreferences prefs = getSharedPreferences(PREFS, MODE_PRIVATE);
+        Set<String> s = new TreeSet<String>();
+        s = prefs.getStringSet(FAVORITES, s);
+        favorites = new ArrayList<String>();
+        if (!s.isEmpty()) {
+            Object[] arr = s.toArray();
+            for (int x = 0; x < arr.length; x++) {
+                String temp = arr[x].toString();
+                favorites.add(temp);
+            }
+        }
+
         homeFragment = new HomeFragment();
         favoriteFragment = new FavoriteFragment();
         searchFragment = new SearchFragment();
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.add(R.id.fragment, homeFragment, "Home");
-        //homeClick(homeFragment);
         ft.commit();
     }
 
@@ -81,5 +102,17 @@ public class MainActivity extends AppCompatActivity implements HomeFragment.Call
     @Override
     public void homeClick(Fragment frag) {
 
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        SharedPreferences prefs = getSharedPreferences(PREFS, MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+
+        Set<String> temp = new HashSet<String>(favorites);
+        editor.putStringSet(FAVORITES, temp);
+        editor.commit();
     }
 }

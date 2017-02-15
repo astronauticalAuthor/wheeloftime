@@ -34,21 +34,6 @@ public class FavoriteFragment extends Fragment implements Toolbar.OnMenuItemClic
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-//        RecyclerView view = (RecyclerView) getActivity().findViewById(R.id.favorite_recycler);
-
-
-
-
-//        ViewPager vp = (ViewPager)findViewById(R.id.pager);
-//        vp.setAdapter(new SampleFragmentPagerAdapter(getSupportFragmentManager(), this));
-//
-//        TabLayout tl = (TabLayout)findViewById(R.id.sliding_tabs);
-//        tl.setupWithViewPager(vp);
-
-//        Bundle extras = getIntent().getExtras();
-//        homeIntent = extras.getParcelable(getString(R.string.HOME_STRING));
-//        searchIntent = extras.getParcelable(getString(R.string.SEARCH_STRING));
     }
 
     @Override

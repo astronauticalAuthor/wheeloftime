@@ -38,71 +38,49 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.View
     private DatabaseReference database;
     private ArrayList<Character> mFavorites = new ArrayList<>();
     private ArrayList<Character> storedCharaters = new ArrayList<Character>();
-    static private String PREFS = "preference";
-    static private String FAVS = "favorites";
 
     public CharacterAdapter(Context context, final String fragmentName) {
         mContext = context;
 
-        if (fragmentName.equals("FavoriteFragment")) {
-            SharedPreferences preferences = mContext.getSharedPreferences(PREFS, MODE_PRIVATE);
-            Set<String> favNames = preferences.getStringSet(FAVS, null);
-
-            mFavorites = namesToCharacters(favNames);
-
-            if (mFavorites != null) {
-                for (Character ch : mFavorites) {
-                    addFavoriteToPage(ch);
+        database = FirebaseDatabase.getInstance().getReference();
+        database.child("Characters").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Set<String> favNames = getNames();
+                Iterator<DataSnapshot> d = dataSnapshot.getChildren().iterator();
+                while (d.hasNext()) {
+                    DataSnapshot next = d.next();
+                    Character temp = new Character(next.child("name").getValue().toString(),
+                                                   next.child("pronunciation").getValue().toString(),
+                                                   next.child("description").getValue().toString(),
+                                                   next.getKey());
+                    if (MainActivity.favorites.contains(temp.getName())) {
+                        temp.setFavorite(true);
+                    }
+                    mCharacters.add(temp);
+                    storedCharaters.add(temp);
                 }
-            } else {
-                mFavorites = new ArrayList<>();
-            }
-        }
-
-
-            database = FirebaseDatabase.getInstance().getReference();
-            database.child("Characters").addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    Set<String> favNames = getNames();
-                    Iterator<DataSnapshot> d = dataSnapshot.getChildren().iterator();
-                    while (d.hasNext()) {
-                        DataSnapshot next = d.next();
-                        Log.d("TTT", next.getKey());
-                        Character temp = new Character(next.child("name").getValue() + "", "XXX", next.child("description").getValue() + "");
-                        if (favNames.contains(temp.getName())) {
-                            temp.setFavorite(true);
+                if (fragmentName.equals("SearchFragment")) {
+                    notifyDataSetChanged();
+                }
+                else if (fragmentName.equals("FavoriteFragment")) {
+                    for (int x = 0; x < MainActivity.favorites.size(); x++) {
+                        for (int y = 0; y < storedCharaters.size(); y++) {
+                            if (MainActivity.favorites.get(x).equals(storedCharaters.get(y).getName())) {
+                                mFavorites.add(storedCharaters.get(y));
+                            }
                         }
-                        mCharacters.add(temp);
-                        storedCharaters.add(temp);
                     }
-                    if (fragmentName.equals("SearchFragment")) {
-                        notifyDataSetChanged();
-                    }
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-                    Log.d("CharacterAdapter", databaseError.getMessage());
-                }
-            });
-
-
-    }
-
-    private ArrayList<Character> namesToCharacters(Set<String> favNames) {
-        ArrayList<Character> favs = new ArrayList<>();
-        if (favNames == null) {
-            return null;
-        }
-        for (String name : favNames) {
-            for (Character ch : mCharacters) {
-                if (ch.getName().equals(name)) {
-                    favs.add(ch);
+                    mCharacters = mFavorites;
+                    notifyDataSetChanged();
                 }
             }
-        }
-        return favs;
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Log.d("CharacterAdapter", databaseError.getMessage());
+            }
+        });
     }
 
     @Override
@@ -147,12 +125,6 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.View
     public void addFavorite(Character ch) {
         mFavorites.add(0, ch);
         addFavoriteToPage(ch);
-        SharedPreferences preferences = mContext.getSharedPreferences(PREFS, MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        Set<String> names = getNames();
-        editor.putStringSet(FAVS, names);
-        editor.apply();
-        Log.d("FUCK", mFavorites.toString());
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
@@ -174,46 +146,28 @@ public class CharacterAdapter extends RecyclerView.Adapter<CharacterAdapter.View
                     detailIntent.putExtra(CharacterDetailActivity.CHARACTER_NAME, character.getName());
                     detailIntent.putExtra(CharacterDetailActivity.CHARACTER_PRONUNCIATION, character.getPronunciation());
                     detailIntent.putExtra(CharacterDetailActivity.CHARACTER_DESCRIPTION, character.getDescription());
+                    detailIntent.putExtra(CharacterDetailActivity.CHARACTER_KEY, character.getKey());
                     mContext.startActivity(detailIntent);
                 }
             });
             favImageView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if (mCharacters.get(getAdapterPosition()).isFavorite()) {
+                    String selected = mCharacters.get(getAdapterPosition()).getName();
+                    if (MainActivity.favorites.contains(selected)) {
+                        MainActivity.favorites.remove(selected);
                         mCharacters.get(getAdapterPosition()).setFavorite(false);
-                        removeFavorite(mCharacters.get(getAdapterPosition()));
                         favImageView.setImageResource(android.R.drawable.star_off);
-                    } else {
-                        mCharacters.get(getAdapterPosition()).setFavorite(true);
+                    }
+                    else {
+                        MainActivity.favorites.add(selected);
                         addFavorite(mCharacters.get(getAdapterPosition()));
                         favImageView.setImageResource(android.R.drawable.star_on);
-
                     }
-
                 }
             });
         }
     }
-
-    private void removeFavorite(Character ch) {
-        mFavorites.remove(ch);
-        SharedPreferences preferences = mContext.getSharedPreferences(PREFS, MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        Set<String> names = getNames();
-        editor.putStringSet(FAVS, names);
-        editor.apply();
-        Log.d("FUCK", mFavorites.toString());
-//        notifyItemRemoved();
-//        notifyItemRangeChanged(0, mFavorites.size());
-    }
-
-    public void addCharacter(Character ch) {
-        notifyItemInserted(0);
-        notifyItemRangeChanged(0, mCharacters.size());
-        notifyItemInserted(0);
-    }
-
 
     private Set<String> getNames() {
         Set<String> names = new HashSet<>();

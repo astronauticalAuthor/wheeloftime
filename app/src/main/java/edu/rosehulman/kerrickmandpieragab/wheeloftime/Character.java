@@ -1,5 +1,7 @@
 package edu.rosehulman.kerrickmandpieragab.wheeloftime;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.provider.MediaStore;
 
 /**
@@ -10,6 +12,7 @@ public class Character {
     private String mName;
     private String mPronunciation;
     private String mDescription;
+    private String mKey;
 
     public boolean isFavorite() {
         return isFavorite;
@@ -26,15 +29,20 @@ public class Character {
         mName = name;
     }
 
-    public Character(String name, String pronunciation, String description) {
+    public Character(String name, String pronunciation, String description, String key) {
         mName = name;
         mPronunciation = pronunciation;
         mDescription = description;
         isFavorite = false;
+        mKey = key;
     }
 
     public String getName() {
         return mName;
+    }
+
+    public String getKey() {
+        return mKey;
     }
 
     public void setName(String name) {
@@ -63,5 +71,21 @@ public class Character {
 
     public void setmAudio(MediaStore.Audio audio) {
         mAudio = audio;
+    }
+
+//    @Override
+//    public int describeContents() {
+//        return 0;
+//    }
+//
+//    @Override
+//    public void writeToParcel(Parcel parcel, int i) {
+//
+//    }
+
+    @Override
+    public boolean equals(Object character) {
+        Character c = (Character)character;
+        return getName().equals(c.getName());
     }
 }

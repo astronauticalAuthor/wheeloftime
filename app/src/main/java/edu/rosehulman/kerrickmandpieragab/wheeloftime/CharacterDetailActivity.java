@@ -27,6 +27,7 @@ public class CharacterDetailActivity extends AppCompatActivity {
     public static String CHARACTER_DESCRIPTION = "CHARACTER_DESCRIPTION";
     public static String CHARACTER_NAME = "CHARACTER_NAME";
     public static String CHARACTER_PRONUNCIATION = "CHARACTER_PRONUNCIATION";
+    public static String CHARACTER_KEY = "CHARACTER_KEY";
     TextView mName;
     TextView mDescription;
     TextView mPronunciation;
@@ -45,15 +46,16 @@ public class CharacterDetailActivity extends AppCompatActivity {
         audio = (ImageButton)findViewById(R.id.audio_button);
 
         Intent intent = getIntent();
+
         mName.setText(intent.getStringExtra(CHARACTER_NAME));
         mDescription.setText(intent.getStringExtra(CHARACTER_DESCRIPTION));
         mPronunciation.setText(intent.getStringExtra(CHARACTER_PRONUNCIATION));
-
+        final String mKey = intent.getStringExtra(CHARACTER_KEY);
 
         audio.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                StorageReference sr = storage.getReferenceFromUrl("gs://wheel-of-time.appspot.com/late.mp3");
+                StorageReference sr = storage.getReferenceFromUrl("gs://wheel-of-time.appspot.com/" + mKey + ".wav");
                 sr.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                     @Override
                     public void onSuccess(Uri uri) {
